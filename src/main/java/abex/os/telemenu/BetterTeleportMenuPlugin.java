@@ -33,7 +33,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Better Teleport Menu"
+	name = "Better Teleport Menu",
+	description = "Customize hotkeys for the Spirit Tree/Jewelery box/Portal nexus layout/Diary/Construction cape interfaces",
+	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind"
 )
 public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
