@@ -17,10 +17,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.MenuAction;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -186,8 +187,13 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			}
 
 			clearKeyListener();
-			addSetOp();
 			hotkeyChanged();
+
+			if (opWidget.getOnOpListener() == null)
+			{
+				// otherwise the actions don't get shown
+				opWidget.setOnOpListener(net.runelite.api.ScriptID.NULL);
+			}
 
 			List<TeleMenu> change = new ArrayList<>(teleMenus);
 			change.add(this);
@@ -207,41 +213,24 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			}
 		}
 
-		void addSetOp()
+		void openSetDialog()
 		{
-			Object[] existing = opWidget.getOnOpListener();
-			if (existing != null && existing.length <= 1)
+			SwingUtilities.invokeLater(() ->
 			{
-				return;
-			}
-			opWidget.setOnOpListener((JavaScriptCallback) ev ->
-			{
-				if (ev.getOp() != 9)
+				Window window = null;
+				for (Component c = (Applet) client; c != null; c = c.getParent())
 				{
-					if (existing != null)
+					if (c instanceof Window)
 					{
-						client.runScript(existing);
+						window = (Window) c;
+						break;
 					}
-					return;
 				}
-
-				SwingUtilities.invokeLater(() ->
+				new HotkeyDialog(window, this.displayText, bind, bind ->
 				{
-					Window window = null;
-					for (Component c = (Applet) client; c != null; c = c.getParent())
-					{
-						if (c instanceof Window)
-						{
-							window = (Window) c;
-							break;
-						}
-					}
-					new HotkeyDialog(window, this.displayText, bind, bind ->
-					{
-						this.bind = bind;
-						configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind);
-						clientThread.invokeLater(() -> hotkeyChanged());
-					});
+					this.bind = bind;
+					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind);
+					clientThread.invokeLater(() -> hotkeyChanged());
 				});
 			});
 		}
@@ -266,6 +255,23 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		boolean matches(KeyEvent keyEvent)
 		{
 			return bind != null && bind.matches(keyEvent);
+		}
+	}
+
+	@Subscribe
+	private void onMenuOptionClicked(MenuOptionClicked ev)
+	{
+		if (ev.getMenuAction() == MenuAction.CC_OP_LOW_PRIORITY && ev.getId() == 9)
+		{
+			for (TeleMenu menu : teleMenus)
+			{
+				if (menu.opWidget.getId() == ev.getWidgetId() && menu.opWidget.getIndex() == ev.getActionParam())
+				{
+					menu.openSetDialog();
+					ev.consume();
+					return;
+				}
+			}
 		}
 	}
 
