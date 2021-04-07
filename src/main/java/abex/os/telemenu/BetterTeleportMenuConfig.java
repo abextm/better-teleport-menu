@@ -18,4 +18,14 @@ public interface BetterTeleportMenuConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "alternateNames",
+		name = "Alternate names",
+		description = "Change confusing names like Carrallangar to more readable variants"
+	)
+	default boolean alternateNames()
+	{
+		return true;
+	}
 }

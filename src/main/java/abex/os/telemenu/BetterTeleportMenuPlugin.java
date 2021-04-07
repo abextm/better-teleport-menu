@@ -1,6 +1,7 @@
 package abex.os.telemenu;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provides;
 import java.applet.Applet;
 import java.awt.Component;
@@ -8,6 +9,7 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -20,6 +22,7 @@ import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.PostStructComposition;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.widgets.Widget;
@@ -27,6 +30,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
@@ -40,8 +44,19 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
+	private static final int PARAMID_TELENEXUS_DESTINATION_NAME = 660;
+
 	@VisibleForTesting
 	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +)(.*?)(\\([^)]+\\))?$");
+
+	private static final Map<Integer, String> ALTERNATE_NEXUS_NAMES = ImmutableMap.<Integer, String>builder()
+		.put(459, "Digsite")
+		.put(460, "Ape Atoll")
+		.put(461, "Canifis")
+		.put(466, "Demonic Ruins")
+		.put(469, "Frozen Waste Plateau")
+		.put(470, "Graveyard of Shadows")
+		.build();
 
 	@Inject
 	private Client client;
@@ -96,6 +111,35 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				activeMenu = cleanify(title);
 				break;
 			}
+		}
+	}
+
+	@Subscribe
+	private void onPostStructComposition(PostStructComposition ev)
+	{
+		String newName = ALTERNATE_NEXUS_NAMES.get(ev.getStructComposition().getId());
+		if (newName != null)
+		{
+			if (config.alternateNames())
+			{
+				String oldName = ev.getStructComposition().getStringValue(PARAMID_TELENEXUS_DESTINATION_NAME);
+				ev.getStructComposition().setValue(PARAMID_TELENEXUS_DESTINATION_NAME, newName + "(" + oldName + ")");
+			}
+		}
+	}
+
+	@Subscribe
+	private void onConfigChanged(ConfigChanged ev)
+	{
+		if (!BetterTeleportMenuConfig.GROUP.equals(ev.getGroup()))
+		{
+			return;
+		}
+
+		if ("alternateNames".equals(ev.getKey()))
+		{
+			clientThread.invoke(() ->
+				client.getStructCompositionCache().reset());
 		}
 	}
 
@@ -356,6 +400,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	protected void shutDown() throws Exception
 	{
 		keyManager.unregisterKeyListener(this);
+		clientThread.invokeLater(() ->
+		{
+			client.getStructCompositionCache().reset();
+		});
 		// less bleh to make work but idc still
 	}
 
