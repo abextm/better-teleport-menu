@@ -254,8 +254,39 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 
 		boolean matches(KeyEvent keyEvent)
 		{
-			return bind != null && bind.matches(keyEvent);
+			if (bind == null)
+			{
+				return false;
+			}
+
+			if (config.aliasNumpad())
+			{
+				if (bind.matches(keyEvent))
+				{
+					return true;
+				}
+
+				int code = keyEvent.getKeyCode();
+				code = swapNumpadKey(code);
+				keyEvent.setKeyCode(code);
+			}
+
+			return bind.matches(keyEvent);
 		}
+	}
+
+	@VisibleForTesting
+	static int swapNumpadKey(int code)
+	{
+		if (code >= KeyEvent.VK_0 && code <= KeyEvent.VK_9)
+		{
+			code += KeyEvent.VK_NUMPAD0 - KeyEvent.VK_0;
+		}
+		else if (code >= KeyEvent.VK_NUMPAD0 && code <= KeyEvent.VK_NUMPAD9)
+		{
+			code += KeyEvent.VK_0 - KeyEvent.VK_NUMPAD0;
+		}
+		return code;
 	}
 
 	@Subscribe

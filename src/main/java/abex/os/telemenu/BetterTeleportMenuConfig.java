@@ -10,12 +10,12 @@ public interface BetterTeleportMenuConfig extends Config
 	String GROUP = "betterteleportmenu";
 
 	@ConfigItem(
-		keyName = "ignore",
-		name = "",
-		description = "ignore me"
+		keyName = "aliasNumpad",
+		name = "Alias Numpad keys",
+		description = "Treat numpad keys as their number row variants"
 	)
-	default String unused()
+	default boolean aliasNumpad()
 	{
-		return null;
+		return true;
 	}
 }
