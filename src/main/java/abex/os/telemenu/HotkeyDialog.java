@@ -9,11 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import net.runelite.client.config.Keybind;
 
 public class HotkeyDialog extends JDialog
 {
-	public HotkeyDialog(Window owner, String titleText, Keybind current, Consumer<Keybind> done)
+	public HotkeyDialog(Window owner, String titleText, Multikeybind current, Consumer<Multikeybind> done)
 	{
 		super(owner, ModalityType.APPLICATION_MODAL);
 		setTitle("Set hotkey");
@@ -23,7 +22,7 @@ public class HotkeyDialog extends JDialog
 		pane.setLayout(gl);
 
 		JLabel title = new JLabel(titleText);
-		HotkeyButton hotkeyBtn = new HotkeyButton(current, false);
+		MultikeybindButton hotkeyBtn = new MultikeybindButton(current);
 
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(ev ->

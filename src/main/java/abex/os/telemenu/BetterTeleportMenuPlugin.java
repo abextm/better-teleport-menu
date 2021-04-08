@@ -73,6 +73,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	@Inject
 	ConfigManager configManager;
 
+	private List<KeyEvent> recentKeypresses = new ArrayList<>();
+
 	private List<TeleMenu> teleMenus = new ArrayList<>();
 
 	private int timeout = 0;
@@ -198,12 +200,17 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		@Setter
 		String identifier = "";
 
+		@Setter
+		String highlightTag = "<shad=ffffff>";
+
 		String displayText;
 		char defaultBind;
 		String preText;
 		String postText;
 
-		Keybind bind;
+		boolean highlight;
+
+		Multikeybind bind;
 
 		public void build()
 		{
@@ -224,10 +231,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			displayText = m.group(4);
 
 			this.identifier += cleanify(displayText);
-			this.bind = configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, Keybind.class);
-			if (this.bind == null)
+			this.bind = Multikeybind.fromConfig(configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier));
+			if (this.bind.isUnset())
 			{
-				this.bind = new Keybind(Character.toUpperCase(defaultBind), 0);
+				this.bind = new Multikeybind(new Keybind(Character.toUpperCase(defaultBind), 0));
 			}
 
 			clearKeyListener();
@@ -247,13 +254,14 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		void hotkeyChanged()
 		{
 			opWidget.setAction(8, "Set Hotkey (" + this.bind + ")");
-			if (Keybind.NOT_SET.equals(this.bind))
+			if (this.bind.isUnset())
 			{
 				textWidget.setText(displayText);
 			}
 			else
 			{
-				textWidget.setText(this.preText + this.bind + this.postText + displayText);
+				String preHighlight = this.highlight ? this.highlightTag : "";
+				textWidget.setText(this.preText + this.bind + this.postText + preHighlight + displayText);
 			}
 		}
 
@@ -273,7 +281,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				new HotkeyDialog(window, this.displayText, bind, bind ->
 				{
 					this.bind = bind;
-					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind);
+					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind.toConfig());
 					clientThread.invokeLater(() -> hotkeyChanged());
 				});
 			});
@@ -296,41 +304,15 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			timeout = client.getGameCycle() + 20;
 		}
 
-		boolean matches(KeyEvent keyEvent)
+		Multikeybind.MatchState matches(List<KeyEvent> keyEvent)
 		{
 			if (bind == null)
 			{
-				return false;
+				return Multikeybind.MatchState.NO;
 			}
 
-			if (config.aliasNumpad())
-			{
-				if (bind.matches(keyEvent))
-				{
-					return true;
-				}
-
-				int code = keyEvent.getKeyCode();
-				code = swapNumpadKey(code);
-				keyEvent.setKeyCode(code);
-			}
-
-			return bind.matches(keyEvent);
+			return bind.matches(keyEvent, config.aliasNumpad());
 		}
-	}
-
-	@VisibleForTesting
-	static int swapNumpadKey(int code)
-	{
-		if (code >= KeyEvent.VK_0 && code <= KeyEvent.VK_9)
-		{
-			code += KeyEvent.VK_NUMPAD0 - KeyEvent.VK_0;
-		}
-		else if (code >= KeyEvent.VK_NUMPAD0 && code <= KeyEvent.VK_NUMPAD9)
-		{
-			code += KeyEvent.VK_0 - KeyEvent.VK_NUMPAD0;
-		}
-		return code;
 	}
 
 	@Subscribe
@@ -416,13 +398,30 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	@Override
 	public void keyPressed(KeyEvent keyEvent)
 	{
+		if (teleMenus.isEmpty())
+		{
+			return;
+		}
+
+		recentKeypresses.add(keyEvent);
+		for (; recentKeypresses.size() > 8; recentKeypresses.remove(0)) ;
 		for (TeleMenu menu : teleMenus)
 		{
-			if (menu.matches(keyEvent))
+			Multikeybind.MatchState match = menu.matches(recentKeypresses);
+			if (match != Multikeybind.MatchState.NO)
 			{
 				keyEvent.consume();
-				clientThread.invokeLater(() -> menu.onTrigger());
-				return;
+
+				if (match == Multikeybind.MatchState.YES)
+				{
+					clientThread.invokeLater(() -> menu.onTrigger());
+					return;
+				}
+			}
+			if (menu.highlight != (match == Multikeybind.MatchState.PARTIAL))
+			{
+				menu.highlight = match == Multikeybind.MatchState.PARTIAL;
+				menu.hotkeyChanged();
 			}
 		}
 	}

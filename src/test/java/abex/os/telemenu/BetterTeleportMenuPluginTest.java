@@ -31,13 +31,4 @@ public class BetterTeleportMenuPluginTest
 		Assert.assertEquals("Foo", m.group(4));
 		Assert.assertEquals(test, m.group(1) + m.group(2) + m.group(3) + m.group(4));
 	}
-
-	@Test
-	public void testAliasNumpad()
-	{
-		Assert.assertEquals(KeyEvent.VK_NUMPAD0, BetterTeleportMenuPlugin.swapNumpadKey(KeyEvent.VK_0));
-		Assert.assertEquals(KeyEvent.VK_0, BetterTeleportMenuPlugin.swapNumpadKey(KeyEvent.VK_NUMPAD0));
-		Assert.assertEquals(KeyEvent.VK_NUMPAD2, BetterTeleportMenuPlugin.swapNumpadKey(KeyEvent.VK_2));
-		Assert.assertEquals(KeyEvent.VK_2, BetterTeleportMenuPlugin.swapNumpadKey(KeyEvent.VK_NUMPAD2));
-	}
 }

@@ -31,25 +31,28 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import lombok.Getter;
 import net.runelite.client.config.Keybind;
-import net.runelite.client.config.ModifierlessKeybind;
 import net.runelite.client.ui.FontManager;
 
-class HotkeyButton extends JButton
+class MultikeybindButton extends JButton
 {
 	@Getter
-	private Keybind value;
+	private Multikeybind value;
+	private boolean fresh = true;
 
-	public HotkeyButton(Keybind value, boolean modifierless)
+	public MultikeybindButton(Multikeybind value)
 	{
+		this.value = value;
+
 		setFont(FontManager.getDefaultFont().deriveFont(12.f));
-		setValue(value);
+		update();
 		addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
 				// We have to use a mouse adapter instead of an action listener so the press action key (space) can be bound
-				setValue(Keybind.NOT_SET);
+				MultikeybindButton.this.value = new Multikeybind();
+				update();
 			}
 		});
 
@@ -58,26 +61,32 @@ class HotkeyButton extends JButton
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
-				if (modifierless)
+				Multikeybind v = MultikeybindButton.this.value;
+				if (fresh)
 				{
-					setValue(new ModifierlessKeybind(e));
+					v = new Multikeybind();
+					fresh = false;
 				}
-				else
+				Keybind newBind = new Keybind(e);
+
+				// prevent modifier only multi key binds
+				if (v.getKeybinds().size() < 1 || newBind.getKeyCode() != KeyEvent.VK_UNDEFINED)
 				{
-					setValue(new Keybind(e));
+					v = v.with(newBind);
 				}
+				if (v.getKeybinds().size() == 2 && v.getKeybinds().get(0).getKeyCode() == KeyEvent.VK_UNDEFINED)
+				{
+					v = new Multikeybind(v.getKeybinds().get(1));
+				}
+
+				MultikeybindButton.this.value = v;
+				update();
 			}
 		});
 	}
 
-	public void setValue(Keybind value)
+	public void update()
 	{
-		if (value == null)
-		{
-			value = Keybind.NOT_SET;
-		}
-
-		this.value = value;
 		setText(value.toString());
 	}
 }
