@@ -8,6 +8,7 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -248,6 +249,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 
 			List<TeleMenu> change = new ArrayList<>(teleMenus);
 			change.add(this);
+			change.sort(Comparator.comparing((TeleMenu tm) -> tm.bind.getKeybinds().size()).reversed());
 			teleMenus = change;
 		}
 
