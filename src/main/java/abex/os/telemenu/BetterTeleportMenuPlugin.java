@@ -112,6 +112,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			{
 				String title = client.getStringStack()[client.getStringStackSize() - 1];
 				activeMenu = cleanify(title);
+				teleMenus = new ArrayList<>();
 				break;
 			}
 		}

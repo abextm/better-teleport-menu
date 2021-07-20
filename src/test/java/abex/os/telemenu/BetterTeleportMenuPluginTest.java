@@ -1,6 +1,5 @@
 package abex.os.telemenu;
 
-import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
