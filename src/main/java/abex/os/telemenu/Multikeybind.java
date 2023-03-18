@@ -131,7 +131,11 @@ public class Multikeybind
 	public static Multikeybind fromConfig(String config)
 	{
 		ImmutableList.Builder<Keybind> v = ImmutableList.builder();
-		if (config != null)
+		if (config == null)
+		{
+			return null;
+		}
+		if (!config.isEmpty())
 		{
 			try
 			{

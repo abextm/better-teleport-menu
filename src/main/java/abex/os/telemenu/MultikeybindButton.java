@@ -85,8 +85,14 @@ class MultikeybindButton extends JButton
 		});
 	}
 
-	public void update()
+	private void update()
 	{
 		setText(value.toString());
+	}
+
+	public void setValue(Multikeybind value)
+	{
+		this.value = value;
+		update();
 	}
 }

@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 public class HotkeyDialog extends JDialog
 {
-	public HotkeyDialog(Window owner, String titleText, Multikeybind current, Consumer<Multikeybind> done)
+	public HotkeyDialog(Window owner, String titleText, Multikeybind defaul, Multikeybind current, Consumer<Multikeybind> done)
 	{
 		super(owner, ModalityType.APPLICATION_MODAL);
 		setTitle("Set hotkey");
@@ -23,6 +23,12 @@ public class HotkeyDialog extends JDialog
 
 		JLabel title = new JLabel(titleText);
 		MultikeybindButton hotkeyBtn = new MultikeybindButton(current);
+
+		JButton defaultBtn = new JButton("Default");
+		defaultBtn.addActionListener(ev ->
+		{
+			hotkeyBtn.setValue(defaul);
+		});
 
 		JButton ok = new JButton("Ok");
 		ok.addActionListener(ev ->
@@ -44,13 +50,18 @@ public class HotkeyDialog extends JDialog
 
 		gl.setVerticalGroup(gl.createSequentialGroup()
 			.addComponent(true, title)
-			.addComponent(hotkeyBtn)
+				.addGroup(gl.createParallelGroup()
+					.addComponent(hotkeyBtn)
+					.addComponent(defaultBtn))
 			.addGroup(gl.createParallelGroup()
 				.addComponent(ok)
 				.addComponent(cancel)));
 		gl.setHorizontalGroup(gl.createParallelGroup()
 			.addComponent(title)
-			.addComponent(hotkeyBtn)
+			.addGroup(gl.createSequentialGroup()
+				.addComponent(hotkeyBtn)
+				.addGap(12)
+				.addComponent(defaultBtn))
 			.addGroup(gl.createSequentialGroup()
 				.addGap(0)
 				.addComponent(ok)

@@ -228,15 +228,15 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				return;
 			}
 			preText = m.group(1);
-			defaultBind = m.group(2).charAt(0);
+			defaultBind = Character.toUpperCase(m.group(2).charAt(0));
 			postText = m.group(3);
 			displayText = m.group(4);
 
 			this.identifier += cleanify(displayText);
 			this.bind = Multikeybind.fromConfig(configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier));
-			if (this.bind.isUnset())
+			if (this.bind == null)
 			{
-				this.bind = new Multikeybind(new Keybind(Character.toUpperCase(defaultBind), 0));
+				this.bind = new Multikeybind(new Keybind(defaultBind, 0));
 			}
 
 			clearKeyListener();
@@ -281,7 +281,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 						break;
 					}
 				}
-				new HotkeyDialog(window, this.displayText, bind, bind ->
+				new HotkeyDialog(window, this.displayText, new Multikeybind(new Keybind(defaultBind, 0)), bind, bind ->
 				{
 					this.bind = bind;
 					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind.toConfig());
