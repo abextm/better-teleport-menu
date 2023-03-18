@@ -362,7 +362,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		{
 			char c = in.charAt(i);
 			c = Character.toLowerCase(c);
-			if (c >= 'a' && c <= 'z')
+			if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
 			{
 				sb.append(c);
 			}
