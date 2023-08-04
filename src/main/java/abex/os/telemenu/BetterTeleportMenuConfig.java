@@ -22,7 +22,7 @@ public interface BetterTeleportMenuConfig extends Config
 	@ConfigItem(
 		keyName = "alternateNames",
 		name = "Alternate names",
-		description = "Change confusing names like Carrallangar to more readable variants"
+		description = "Change confusing names like Carrallanger to more readable variants"
 	)
 	default boolean alternateNames()
 	{
