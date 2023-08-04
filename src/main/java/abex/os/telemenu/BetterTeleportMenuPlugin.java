@@ -48,7 +48,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	private static final int PARAMID_TELENEXUS_DESTINATION_NAME = 660;
 
 	@VisibleForTesting
-	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +)(.*?)(\\([^)]+\\))?$");
+	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +)(.*?)((?:\\([^)]+\\))?)$");
 
 	private static final Map<Integer, String> ALTERNATE_NEXUS_NAMES = ImmutableMap.<Integer, String>builder()
 		.put(459, "Digsite")
@@ -128,7 +128,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			if (config.alternateNames())
 			{
 				String oldName = ev.getStructComposition().getStringValue(PARAMID_TELENEXUS_DESTINATION_NAME);
-				ev.getStructComposition().setValue(PARAMID_TELENEXUS_DESTINATION_NAME, newName + "(" + oldName + ")");
+				ev.getStructComposition().setValue(PARAMID_TELENEXUS_DESTINATION_NAME, newName + " (" + oldName + ")");
 			}
 		}
 	}
@@ -231,9 +231,9 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			preText = m.group(1);
 			defaultBind = Character.toUpperCase(m.group(2).charAt(0));
 			postText = m.group(3);
-			displayText = m.group(4);
+			displayText = m.group(4) + m.group(5);
 
-			this.identifier += cleanify(displayText);
+			this.identifier += cleanify(m.group(4));
 			this.bind = Multikeybind.fromConfig(configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier));
 			if (this.bind == null)
 			{
