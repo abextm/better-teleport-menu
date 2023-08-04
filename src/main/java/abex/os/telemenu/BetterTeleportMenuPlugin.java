@@ -79,6 +79,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	private List<TeleMenu> teleMenus = new ArrayList<>();
 
 	private int timeout = 0;
+	private boolean menuJustOpened = false;
 
 	@Subscribe
 	private void onGameTick(GameTick t)
@@ -252,6 +253,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			change.add(this);
 			change.sort(Comparator.comparing((TeleMenu tm) -> tm.bind.getKeybinds().size()).reversed());
 			teleMenus = change;
+
+			menuJustOpened = true;
 		}
 
 		void hotkeyChanged()
@@ -404,6 +407,12 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		if (teleMenus.isEmpty())
 		{
 			return;
+		}
+
+		if (menuJustOpened)
+		{
+			menuJustOpened = false;
+			recentKeypresses.clear();
 		}
 
 		recentKeypresses.add(keyEvent);
