@@ -8,6 +8,7 @@ import net.runelite.client.config.ConfigItem;
 public interface BetterTeleportMenuConfig extends Config
 {
 	String GROUP = "betterteleportmenu";
+	String KEYBIND_PREFIX = "keybind.";
 
 	@ConfigItem(
 		keyName = "aliasNumpad",

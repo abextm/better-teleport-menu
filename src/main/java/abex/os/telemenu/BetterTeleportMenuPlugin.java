@@ -1,7 +1,9 @@
 package abex.os.telemenu;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Provides;
 import java.applet.Applet;
 import java.awt.Component;
@@ -9,6 +11,7 @@ import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -58,6 +61,16 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		.put(469, "Frozen Waste Plateau")
 		.put(470, "Graveyard of Shadows")
 		.build();
+
+	// cleanify(display) -> canon
+	private static Map<String, String> canonicalNames = new HashMap<>();
+	// canon -> old
+	private static Multimap<String, String> migrateNames = HashMultimap.create();
+
+	static
+	{
+		migrateNames.put("telenexus-carralanger", "telenexus-carralangar");
+	}
 
 	@Inject
 	private Client client;
@@ -128,6 +141,11 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			if (config.alternateNames())
 			{
 				String oldName = ev.getStructComposition().getStringValue(PARAMID_TELENEXUS_DESTINATION_NAME);
+				// the old name in parentheses is stripped before being passed to cleanify
+				String cleanOld = "telenexus-" + cleanify(oldName);
+				String cleanNew = "telenexus-" + cleanify(newName);
+				canonicalNames.put(cleanNew + "-", cleanOld);
+				migrateNames.put(cleanOld, cleanNew); // versions which wrote this did not include the -
 				ev.getStructComposition().setValue(PARAMID_TELENEXUS_DESTINATION_NAME, newName + " (" + oldName + ")");
 			}
 		}
@@ -234,7 +252,34 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			displayText = m.group(4) + m.group(5);
 
 			this.identifier += cleanify(m.group(4));
-			this.bind = Multikeybind.fromConfig(configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier));
+			this.identifier = canonicalNames.getOrDefault(this.identifier, this.identifier);
+			String strConfigValue = null;
+			for (String ident : migrateNames.get(this.identifier))
+			{
+				if (ident.equals(identifier))
+				{
+					continue;
+				}
+
+				String v = configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + ident);
+				if (v != null)
+				{
+					strConfigValue = v;
+					configManager.unsetConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + ident);
+				}
+			}
+			{
+				String v = configManager.getConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + identifier);
+				if (v != null)
+				{
+					strConfigValue = v;
+				}
+				else if (strConfigValue != null)
+				{
+					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + identifier, strConfigValue);
+				}
+			}
+			this.bind = Multikeybind.fromConfig(strConfigValue);
 			if (this.bind == null)
 			{
 				this.bind = new Multikeybind(new Keybind(defaultBind, 0));
@@ -287,7 +332,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				new HotkeyDialog(window, this.displayText, new Multikeybind(new Keybind(defaultBind, 0)), bind, bind ->
 				{
 					this.bind = bind;
-					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, "keybind." + identifier, bind.toConfig());
+					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + identifier, bind.toConfig());
 					clientThread.invokeLater(() -> hotkeyChanged());
 				});
 			});
