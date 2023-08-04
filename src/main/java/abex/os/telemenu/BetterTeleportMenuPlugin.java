@@ -373,7 +373,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		{
 			for (TeleMenu menu : teleMenus)
 			{
-				if (menu.opWidget.getId() == ev.getWidgetId() && menu.opWidget.getIndex() == ev.getActionParam())
+				if (menu.opWidget.getId() == ev.getParam1() && menu.opWidget.getIndex() == ev.getParam0())
 				{
 					menu.openSetDialog();
 					ev.consume();
