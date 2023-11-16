@@ -17,17 +17,18 @@ public class BetterTeleportMenuPluginTest
 	@Test
 	public void testKeyMatcher()
 	{
-		testKeyMatcher("<col=ccccff>1:</col> Foo", "");
-		testKeyMatcher("<col=ccccff>1</col>: Foo", "");
-		testKeyMatcher("<col=ccccff>1</col> :  Foo", "");
-		testKeyMatcher("<col=ccccff>1</col> :  Foo", "(Ignore Me)");
+		testKeyMatcher("<col=ccccff>1:</col> Foo", "", "1");
+		testKeyMatcher("<col=ccccff>1</col>: Foo", "", "1");
+		testKeyMatcher("<col=ccccff>1</col> :  Foo", "", "1");
+		testKeyMatcher("<col=ccccff>1</col> :  Foo", "(Ignore Me)", "1");
+		testKeyMatcher("Foo", "", null);
 	}
-	void testKeyMatcher(String test, String badSuffix)
+	void testKeyMatcher(String test, String badSuffix, String key)
 	{
 		Matcher m = BetterTeleportMenuPlugin.KEY_PREFIX_MATCHER.matcher(test + badSuffix);
 		Assert.assertTrue(test, m.find());
-		Assert.assertEquals("1", m.group(2));
+		Assert.assertEquals(key, m.group(2));
 		Assert.assertEquals("Foo", m.group(4));
-		Assert.assertEquals(test, m.group(1) + m.group(2) + m.group(3) + m.group(4));
+		Assert.assertEquals(test, (key != null ? m.group(1) + m.group(2) + m.group(3) : "") + m.group(4));
 	}
 }

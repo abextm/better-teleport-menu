@@ -50,8 +50,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
 	private static final int PARAMID_TELENEXUS_DESTINATION_NAME = 660;
 
+	private static final char CHAR_UNSET = '\0';
+
 	@VisibleForTesting
-	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +)(.*?)((?:\\([^)]+\\))?)$");
+	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(?:(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +))?(.*?)((?:\\([^)]+\\))?)$");
 
 	private static final Map<Integer, String> ALTERNATE_NEXUS_NAMES = ImmutableMap.<Integer, String>builder()
 		.put(459, "Digsite")
@@ -257,8 +259,23 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				return;
 			}
 			preText = m.group(1);
-			defaultBind = Character.toUpperCase(m.group(2).charAt(0));
+			if (preText == null)
+			{
+				preText = "<col=735a28>";
+			}
+			if (m.group(2) == null)
+			{
+				defaultBind = CHAR_UNSET;
+			}
+			else
+			{
+				defaultBind = Character.toUpperCase(m.group(2).charAt(0));
+			}
 			postText = m.group(3);
+			if (postText == null)
+			{
+				postText = "</col>: ";
+			}
 			displayText = m.group(4) + m.group(5);
 
 			this.identifier += cleanify(m.group(4));
@@ -292,7 +309,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			this.bind = Multikeybind.fromConfig(strConfigValue);
 			if (this.bind == null)
 			{
-				this.bind = new Multikeybind(new Keybind(defaultBind, 0));
+				this.bind = defaultMultiBind();
 			}
 
 			disabled = disable != null && config.hideDisabled() && displayText.startsWith("<str>");
@@ -316,6 +333,15 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			teleMenus = change;
 
 			menuJustOpened = true;
+		}
+
+		Multikeybind defaultMultiBind()
+		{
+			if (defaultBind == CHAR_UNSET)
+			{
+				return new Multikeybind();
+			}
+			return new Multikeybind(new Keybind(defaultBind, 0));
 		}
 
 		void hotkeyChanged()
@@ -345,7 +371,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 						break;
 					}
 				}
-				new HotkeyDialog(window, this.displayText, new Multikeybind(new Keybind(defaultBind, 0)), bind, bind ->
+				new HotkeyDialog(window, this.displayText, defaultMultiBind(), bind, bind ->
 				{
 					this.bind = bind;
 					configManager.setConfiguration(BetterTeleportMenuConfig.GROUP, BetterTeleportMenuConfig.KEYBIND_PREFIX + identifier, bind.toConfig());
