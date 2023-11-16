@@ -44,7 +44,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 @PluginDescriptor(
 	name = "Better Teleport Menu",
 	description = "Customize hotkeys for the Spirit Tree/Jewelery box/Portal nexus layout/Diary/Construction cape interfaces",
-	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind"
+	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind,disable,strikethrough"
 )
 public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
@@ -180,6 +180,12 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 						.opWidget(client.getScriptActiveWidget())
 						.keyListenerWidget(client.getScriptDotWidget())
 						.identifier(activeMenu)
+						.disable(() ->
+						{
+							Widget textWidget = client.getScriptActiveWidget();
+							textWidget.setHidden(true);
+							client.getIntStack()[client.getIntStackSize() - 1] -= textWidget.getOriginalHeight();
+						})
 						.build();
 				}
 				break;
@@ -224,12 +230,16 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		@Setter
 		String highlightTag = "<shad=ffffff>";
 
+		@Setter
+		Runnable disable;
+
 		String displayText;
 		char defaultBind;
 		String preText;
 		String postText;
 
 		boolean highlight;
+		boolean disabled;
 
 		Multikeybind bind;
 
@@ -283,6 +293,12 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			if (this.bind == null)
 			{
 				this.bind = new Multikeybind(new Keybind(defaultBind, 0));
+			}
+
+			disabled = disable != null && config.hideDisabled() && displayText.startsWith("<str>");
+			if (disabled)
+			{
+				disable.run();
 			}
 
 			clearKeyListener();
@@ -345,7 +361,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 
 		void onTrigger()
 		{
-			if (timeout >= client.getGameCycle())
+			if (disabled || timeout >= client.getGameCycle())
 			{
 				return;
 			}

@@ -29,4 +29,14 @@ public interface BetterTeleportMenuConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "hideDisabled",
+		name = "Hide disabled entries",
+		description = "Prevent showing of disabled (strikethrough) entries in the \"scroll\"-style menu"
+	)
+	default boolean hideDisabled()
+	{
+		return true;
+	}
 }
