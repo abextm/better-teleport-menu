@@ -39,4 +39,14 @@ public interface BetterTeleportMenuConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "expandScrollMenu",
+		name = "Expand scroll menu",
+		description = "Allow the \"scroll\"-style menu to get taller"
+	)
+	default boolean expandScrollMenu()
+	{
+		return true;
+	}
 }

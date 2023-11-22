@@ -24,6 +24,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.PostStructComposition;
@@ -39,6 +40,7 @@ import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -87,7 +89,13 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	private BetterTeleportMenuConfig config;
 
 	@Inject
-	ConfigManager configManager;
+	private ConfigManager configManager;
+
+	@Inject
+	private OverlayManager overlayManager;
+
+	@Inject
+	private MenuBackgroundOverlay menuBackgroundOverlay;
 
 	private List<KeyEvent> recentKeypresses = new ArrayList<>();
 
@@ -115,6 +123,11 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		{
 			teleMenus = change;
 		}
+	}
+
+	@Subscribe
+	private void onBeforeRender(BeforeRender ev)
+	{
 	}
 
 	private String activeMenu = null;
@@ -173,6 +186,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	{
 		switch (ev.getScriptId())
 		{
+			case ScriptID.MENU:
+			case ScriptID.TOPLEVEL_RESIZE:
+				menuBackgroundOverlay.resize();
+				break;
 			case ScriptID.MENU_CREATEENTRY:
 				if (activeMenu != null)
 				{
@@ -469,6 +486,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	{
 		keyManager.registerKeyListener(this);
 		// bleh idc to make this work
+
+		overlayManager.add(menuBackgroundOverlay);
 	}
 
 	@Override
@@ -480,6 +499,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			client.getStructCompositionCache().reset();
 		});
 		// less bleh to make work but idc still
+
+		overlayManager.remove(menuBackgroundOverlay);
 	}
 
 	@Override
