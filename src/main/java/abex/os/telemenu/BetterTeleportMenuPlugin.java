@@ -97,6 +97,9 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	@Inject
 	private MenuBackgroundOverlay menuBackgroundOverlay;
 
+	@Inject
+	private VarlamoreOverlay varlamoreOverlay;
+
 	private List<KeyEvent> recentKeypresses = new ArrayList<>();
 
 	private List<TeleMenu> teleMenus = new ArrayList<>();
@@ -488,6 +491,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		// bleh idc to make this work
 
 		overlayManager.add(menuBackgroundOverlay);
+		overlayManager.add(varlamoreOverlay);
 	}
 
 	@Override
@@ -501,6 +505,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		// less bleh to make work but idc still
 
 		overlayManager.remove(menuBackgroundOverlay);
+		overlayManager.remove(varlamoreOverlay);
 	}
 
 	@Override

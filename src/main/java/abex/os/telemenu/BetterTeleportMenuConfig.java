@@ -49,4 +49,14 @@ public interface BetterTeleportMenuConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "enhanceQuetzalContrast",
+		name = "Enhance Quetzal contrast",
+		description = "Darken non-interactive elements in the Varlamore quetzel transportation menu"
+	)
+	default boolean enhanceQuetzalContrast()
+	{
+		return true;
+	}
 }
