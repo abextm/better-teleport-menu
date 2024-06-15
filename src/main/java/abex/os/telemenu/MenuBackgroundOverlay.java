@@ -131,24 +131,24 @@ public class MenuBackgroundOverlay extends Overlay
 
 		Model m = md.cloneVertices().light();
 
-		int[] vy = m.getVerticesZ();
-		int min = Integer.MAX_VALUE;
-		int max = Integer.MIN_VALUE;
-		for (int y : vy)
+		float[] vy = m.getVerticesZ();
+		float min = Integer.MAX_VALUE;
+		float max = Integer.MIN_VALUE;
+		for (float y : vy)
 		{
 			min = Math.min(min, y);
 			max = Math.max(max, y);
 		}
 
-		int totalHeight = max - min;
-		int hiEdge = max - (312 * totalHeight / 334);
-		int loEdge = max - (90 + totalHeight / 334);
-		int adj = (hiEdge + loEdge) / 2;
+		float totalHeight = max - min;
+		float hiEdge = max - (312 * totalHeight / 334);
+		float loEdge = max - (90 + totalHeight / 334);
+		float adj = (hiEdge + loEdge) / 2;
 
 		for (int i = 0; i < vy.length; i++)
 		{
-			int y = vy[i];
-			int y2 = Math.min(Math.max(y, hiEdge), loEdge) - adj;
+			float y = vy[i];
+			float y2 = Math.min(Math.max(y, hiEdge), loEdge) - adj;
 			y = (y - y2) + (y2 * content.getHeight()) / 232;
 			vy[i] = y;
 		}
