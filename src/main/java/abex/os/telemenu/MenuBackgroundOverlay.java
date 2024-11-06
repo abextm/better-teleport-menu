@@ -36,6 +36,7 @@ public class MenuBackgroundOverlay extends Overlay
 
 		drawAfterLayer(IF_MENU, 0);
 		setPosition(OverlayPosition.DYNAMIC);
+		setPriority(-1.f);
 		setLayer(OverlayLayer.MANUAL);
 	}
 
