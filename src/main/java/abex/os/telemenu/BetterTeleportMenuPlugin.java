@@ -299,6 +299,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			displayText = m.group(4) + m.group(5);
 
 			this.identifier += cleanify(m.group(4));
+			if (!"spirit-tree-locations-your-house-".equals(this.identifier))
+			{
+				this.identifier += cleanify(m.group(5));
+			}
 			this.identifier = canonicalNames.getOrDefault(this.identifier, this.identifier);
 			String strConfigValue = null;
 			for (String ident : migrateNames.get(this.identifier))
