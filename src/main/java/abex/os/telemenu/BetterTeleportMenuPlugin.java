@@ -536,6 +536,11 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		for (; recentKeypresses.size() > 8; recentKeypresses.remove(0)) ;
 		for (TeleMenu menu : teleMenus)
 		{
+			if (menu.disabled)
+			{
+				continue;
+			}
+
 			Multikeybind.MatchState match = menu.matches(recentKeypresses);
 			if (match != Multikeybind.MatchState.NO)
 			{
