@@ -45,8 +45,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @Slf4j
 @PluginDescriptor(
 	name = "Better Teleport Menu",
-	description = "Customize hotkeys for the Spirit Tree/Jewelery box/Portal nexus layout/Diary/Construction cape interfaces",
-	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind,disable,strikethrough"
+	description = "Customize hotkeys for the Spirit Tree/Jewelery box/Portal nexus layout/Diary/Construction cape interfaces & enlarge league menus",
+	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind,ancient,names,disable,strikethrough,league,clue compass,fairys flight,bank heist"
 )
 public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
