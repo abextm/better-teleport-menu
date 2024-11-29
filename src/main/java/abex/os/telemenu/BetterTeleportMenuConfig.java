@@ -59,4 +59,14 @@ public interface BetterTeleportMenuConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "showLastDestination",
+		name = "Show current \"Last-destination\"",
+		description = "Show what the last destination is current set to in the Clue compass menu"
+	)
+	default boolean showLastDestination()
+	{
+		return true;
+	}
 }

@@ -3,6 +3,7 @@ package abex.os.telemenu;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.inject.Provides;
 import java.applet.Applet;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
@@ -23,8 +25,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.PostStructComposition;
 import net.runelite.api.events.ScriptPostFired;
@@ -46,7 +50,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDescriptor(
 	name = "Better Teleport Menu",
 	description = "Customize hotkeys for the Spirit Tree/Jewelery box/Portal nexus layout/Diary/Construction cape interfaces & enlarge league menus",
-	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind,ancient,names,disable,strikethrough,league,clue compass,fairys flight,bank heist"
+	tags = "poh,jewelery,cape,diary,tele,port,nexus,hotkey,keybind,ancient,names,disable,strikethrough,league,clue compass,fairys flight,bank heist,last destination"
 )
 public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 {
@@ -65,6 +69,12 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		.put(469, "Frozen Waste Plateau")
 		.put(470, "Graveyard of Shadows")
 		.build();
+
+	private static final Map<Integer, String> SAVE_LAST_DEST = ImmutableMap.<Integer, String>builder()
+		.put(ItemID.CLUE_COMPASS, "clue-compass-teleports")
+		.put(ItemID.BANKERS_BRIEFCASE, "bank-heist-teleports")
+		.build();
+	private static final Set<String> LAST_DEST_NAMES = ImmutableSet.copyOf(SAVE_LAST_DEST.values());
 
 	// cleanify(display) -> canon
 	private static Map<String, String> canonicalNames = new HashMap<>();
@@ -253,6 +263,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		@Setter
 		String identifier = "";
 
+		String menuIdentifier = "";
+
 		@Setter
 		String highlightTag = "<shad=ffffff>";
 
@@ -271,6 +283,8 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 
 		public void build()
 		{
+			menuIdentifier = identifier;
+
 			if (!this.identifier.isEmpty())
 			{
 				this.identifier += "-";
@@ -420,9 +434,18 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				return;
 			}
 
+			saveLastDest();
 			resume(resumeWidget);
 			textWidget.setText("Please wait...");
 			timeout = client.getGameCycle() + 20;
+		}
+
+		void saveLastDest()
+		{
+			if (LAST_DEST_NAMES.contains(menuIdentifier))
+			{
+				configManager.setRSProfileConfiguration(BetterTeleportMenuConfig.GROUP, "lastdest." + menuIdentifier, displayText);
+			}
 		}
 
 		Multikeybind.MatchState matches(List<KeyEvent> keyEvent)
@@ -433,6 +456,23 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			}
 
 			return bind.matches(keyEvent, config.aliasNumpad());
+		}
+	}
+
+	@Subscribe
+	private void onMenuEntryAdded(MenuEntryAdded ev)
+	{
+		if (ev.getMenuEntry().isItemOp() && "Last-destination".equals(ev.getOption()) && config.showLastDestination())
+		{
+			String name = SAVE_LAST_DEST.get(ev.getMenuEntry().getItemId());
+			if (name != null)
+			{
+				String last = configManager.getRSProfileConfiguration(BetterTeleportMenuConfig.GROUP, "lastdest." + name);
+				if (last != null)
+				{
+					ev.getMenuEntry().setOption(ev.getMenuEntry().getOption() + " (" + last + ")");
+				}
+			}
 		}
 	}
 
@@ -448,6 +488,17 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 					menu.openSetDialog();
 					ev.consume();
 					return;
+				}
+			}
+		}
+
+		if (ev.getMenuAction() == MenuAction.WIDGET_CONTINUE)
+		{
+			for (TeleMenu menu : teleMenus)
+			{
+				if (menu.opWidget.getId() == ev.getParam1() && menu.opWidget.getIndex() == ev.getParam0())
+				{
+					menu.saveLastDest();
 				}
 			}
 		}
