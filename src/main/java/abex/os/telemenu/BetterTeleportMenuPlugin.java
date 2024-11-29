@@ -188,7 +188,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		}
 	}
 
-	@Subscribe
+	@Subscribe(priority = 1.f)
 	private void onScriptPostFired(ScriptPostFired ev)
 	{
 		switch (ev.getScriptId())
