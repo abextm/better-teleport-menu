@@ -60,9 +60,10 @@ public class MenuBackgroundOverlay extends Overlay
 
 		Widget parent = bgContainer.getParent(); // 164:16
 		Widget model = bgContainer.getChild(0);
+		Widget title = bgContainer.getChild(1);
 		Widget scrollbar = client.getWidget(IF_MENU, 2);
 		Widget contents = client.getWidget(IF_MENU, 3);
-		if (parent == null || model == null || scrollbar == null || contents == null || model.isHidden()) // isHidden for spirit-tree-maps compat
+		if (parent == null || model == null || scrollbar == null || contents == null || title == null || title.isHidden()) // isHidden for spirit-tree-maps compat
 		{
 			return false;
 		}
