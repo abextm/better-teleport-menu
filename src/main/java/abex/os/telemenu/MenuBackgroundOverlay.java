@@ -17,7 +17,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 public class MenuBackgroundOverlay extends Overlay
 {
-	private static final int IF_MENU = 187;
+	public static final int IF_MENU = 187;
 
 	private final Client client;
 	private final ClientThread clientThread;
@@ -38,6 +38,11 @@ public class MenuBackgroundOverlay extends Overlay
 		setPosition(OverlayPosition.DYNAMIC);
 		setPriority(-1.f);
 		setLayer(OverlayLayer.MANUAL);
+	}
+
+	public void onInterfaceLoaded()
+	{
+		this.hasPatched = false;
 	}
 
 	public void resize()

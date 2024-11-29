@@ -24,12 +24,12 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.PostStructComposition;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -129,8 +129,12 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	}
 
 	@Subscribe
-	private void onBeforeRender(BeforeRender ev)
+	private void onWidgetLoaded(WidgetLoaded wl)
 	{
+		if (wl.getGroupId() == MenuBackgroundOverlay.IF_MENU)
+		{
+			menuBackgroundOverlay.onInterfaceLoaded();
+		}
 	}
 
 	private String activeMenu = null;
