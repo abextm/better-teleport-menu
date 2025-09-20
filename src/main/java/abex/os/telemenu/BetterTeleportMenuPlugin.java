@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.inject.Provides;
-import java.applet.Applet;
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
@@ -405,7 +404,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			SwingUtilities.invokeLater(() ->
 			{
 				Window window = null;
-				for (Component c = (Applet) client; c != null; c = c.getParent())
+				for (Component c = (Component) client; c != null; c = c.getParent())
 				{
 					if (c instanceof Window)
 					{
