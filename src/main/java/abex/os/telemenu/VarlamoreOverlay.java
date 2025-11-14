@@ -9,6 +9,7 @@ import net.runelite.api.Model;
 import net.runelite.api.ModelData;
 import net.runelite.api.Perspective;
 import net.runelite.api.Rasterizer;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.ui.overlay.Overlay;
@@ -17,10 +18,6 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 public class VarlamoreOverlay extends Overlay
 {
-	private static final int IF_VARLAMORE_TELEMENU = 874;
-	private static final int CC_VT_BG_LAYER = 2;
-	private static final int CC_VT_BG_MODEL = 3;
-
 	private final Client client;
 	private final BetterTeleportMenuConfig config;
 
@@ -30,7 +27,7 @@ public class VarlamoreOverlay extends Overlay
 		this.client = client;
 		this.config = config;
 
-		drawAfterLayer(IF_VARLAMORE_TELEMENU, CC_VT_BG_LAYER);
+		drawAfterLayer(InterfaceID.QuetzalMenu.BACKGROUND);
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.MANUAL);
 	}
@@ -38,7 +35,7 @@ public class VarlamoreOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics2D)
 	{
-		Widget bgWidget = client.getWidget(IF_VARLAMORE_TELEMENU, CC_VT_BG_MODEL);
+		Widget bgWidget = client.getWidget(InterfaceID.QuetzalMenu.SCROLL);
 		if (bgWidget == null || bgWidget.getType() != WidgetType.MODEL || !config.enhanceQuetzalContrast())
 		{
 			return null;

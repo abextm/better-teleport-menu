@@ -9,6 +9,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Model;
 import net.runelite.api.ModelData;
 import net.runelite.api.Rasterizer;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.overlay.Overlay;
@@ -17,8 +18,6 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 public class MenuBackgroundOverlay extends Overlay
 {
-	public static final int IF_MENU = 187;
-
 	private final Client client;
 	private final ClientThread clientThread;
 	private final BetterTeleportMenuConfig config;
@@ -34,7 +33,7 @@ public class MenuBackgroundOverlay extends Overlay
 		this.clientThread = clientThread;
 		this.config = config;
 
-		drawAfterLayer(IF_MENU, 0);
+		drawAfterLayer(InterfaceID.Menu.LJ_LAYER2);
 		setPosition(OverlayPosition.DYNAMIC);
 		setPriority(-1.f);
 		setLayer(OverlayLayer.MANUAL);
@@ -52,7 +51,7 @@ public class MenuBackgroundOverlay extends Overlay
 
 	private boolean resize0()
 	{
-		Widget bgContainer = client.getWidget(IF_MENU, 0);
+		Widget bgContainer = client.getWidget(InterfaceID.Menu.LJ_LAYER2);
 		if (bgContainer == null || !config.expandScrollMenu())
 		{
 			return false;
@@ -61,8 +60,8 @@ public class MenuBackgroundOverlay extends Overlay
 		Widget parent = bgContainer.getParent(); // 164:16
 		Widget model = bgContainer.getChild(0);
 		Widget title = bgContainer.getChild(1);
-		Widget scrollbar = client.getWidget(IF_MENU, 2);
-		Widget contents = client.getWidget(IF_MENU, 3);
+		Widget scrollbar = client.getWidget(InterfaceID.Menu.LJ_SCROLL_BAR);
+		Widget contents = client.getWidget(InterfaceID.Menu.LJ_LAYER1);
 		if (parent == null || model == null || scrollbar == null || contents == null || title == null || title.isHidden()) // isHidden for spirit-tree-maps compat
 		{
 			return false;
@@ -120,8 +119,8 @@ public class MenuBackgroundOverlay extends Overlay
 			return null;
 		}
 
-		Widget container = client.getWidget(IF_MENU, 0);
-		Widget content = client.getWidget(IF_MENU, 3);
+		Widget container = client.getWidget(InterfaceID.Menu.LJ_LAYER2);
+		Widget content = client.getWidget(InterfaceID.Menu.LJ_LAYER1);
 		if (container == null || content == null || container.getChild(1) == null)
 		{
 			drawBackground = false;

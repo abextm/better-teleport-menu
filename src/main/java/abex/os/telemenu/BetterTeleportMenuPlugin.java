@@ -32,7 +32,9 @@ import net.runelite.api.events.PostStructComposition;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -140,7 +142,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	@Subscribe
 	private void onWidgetLoaded(WidgetLoaded wl)
 	{
-		if (wl.getGroupId() == MenuBackgroundOverlay.IF_MENU)
+		if (wl.getGroupId() == InterfaceID.MENU)
 		{
 			menuBackgroundOverlay.onInterfaceLoaded();
 		}
@@ -365,7 +367,9 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 			if (opWidget.getOnOpListener() == null)
 			{
 				// otherwise the actions don't get shown
-				opWidget.setOnOpListener(net.runelite.api.ScriptID.NULL);
+				opWidget.setOnOpListener((JavaScriptCallback) (ev ->
+				{
+				}));
 			}
 
 			List<TeleMenu> change = new ArrayList<>(teleMenus);
