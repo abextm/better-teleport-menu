@@ -162,6 +162,13 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 				teleMenus = new ArrayList<>();
 				break;
 			}
+			case ScriptID.MENU_NEW_SETUP:
+			{
+				String title = (String) ev.getScriptEvent().getArguments()[1];
+				activeMenu = cleanify(title);
+				teleMenus = new ArrayList<>();
+				break;
+			}
 		}
 	}
 
@@ -223,6 +230,18 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 							textWidget.setHidden(true);
 							client.getIntStack()[client.getIntStackSize() - 1] -= textWidget.getOriginalHeight();
 						})
+						.build();
+				}
+				break;
+			case ScriptID.MENU_NEW_CREATEENTRY:
+				if (activeMenu != null)
+				{
+					new TeleMenu()
+						.textWidget(client.getScriptActiveWidget())
+						.resumeWidget(client.getScriptActiveWidget())
+						.opWidget(client.getScriptActiveWidget())
+						.keyListenerWidget(client.getScriptDotWidget())
+						.identifier(activeMenu)
 						.build();
 				}
 				break;
