@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = 'abex.os.telemenu'
-version = '1.5.9'
+version = '1.5.10'
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
