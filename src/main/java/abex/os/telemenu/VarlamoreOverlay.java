@@ -28,6 +28,7 @@ public class VarlamoreOverlay extends Overlay
 		this.config = config;
 
 		drawAfterLayer(InterfaceID.QuetzalMenu.BACKGROUND);
+		drawAfterLayer(InterfaceID.QuetzalwhistleMenu.BACKGROUND);
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.MANUAL);
 	}
@@ -36,6 +37,10 @@ public class VarlamoreOverlay extends Overlay
 	public Dimension render(Graphics2D graphics2D)
 	{
 		Widget bgWidget = client.getWidget(InterfaceID.QuetzalMenu.SCROLL);
+		if (bgWidget == null)
+		{
+			bgWidget = client.getWidget(InterfaceID.QuetzalwhistleMenu.SCROLL);
+		}
 		if (bgWidget == null || bgWidget.getType() != WidgetType.MODEL || !config.enhanceQuetzalContrast())
 		{
 			return null;
