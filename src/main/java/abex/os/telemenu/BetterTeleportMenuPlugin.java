@@ -63,12 +63,15 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	static final Pattern KEY_PREFIX_MATCHER = Pattern.compile("^(?:(<[^>]+>)([A-Za-z0-9])(:</[^>]+> |</[^>]+> *: +))?(.*?)((?:\\([^)]+\\))?)$");
 
 	private static final Map<Integer, String> ALTERNATE_NEXUS_NAMES = ImmutableMap.<Integer, String>builder()
-		.put(459, "Digsite")
+		.put(459, "Exam Centre")
 		.put(460, "Ape Atoll")
 		.put(461, "Canifis")
 		.put(466, "Demonic Ruins")
 		.put(469, "Frozen Waste Plateau")
 		.put(470, "Graveyard of Shadows")
+		.put(6415, "Edgeville Dungeon")
+		.put(6416, "Ice Mountain")
+		.put(6417, "Crazy Archaeologist")
 		.build();
 
 	private static final Map<Integer, String> SAVE_LAST_DEST = ImmutableMap.<Integer, String>builder()
