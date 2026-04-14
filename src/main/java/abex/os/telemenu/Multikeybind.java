@@ -16,6 +16,8 @@ import net.runelite.client.config.Keybind;
 @EqualsAndHashCode
 public class Multikeybind
 {
+	private static final String UNSET = "_";
+
 	@Getter
 	private final List<Keybind> keybinds;
 
@@ -123,9 +125,14 @@ public class Multikeybind
 
 	public String toConfig()
 	{
-		return keybinds.stream()
+		var cfg = keybinds.stream()
 			.map(k -> k.getKeyCode() + ":" + k.getModifiers())
 			.collect(Collectors.joining(":"));
+		if (cfg.isEmpty())
+		{
+			cfg = UNSET;
+		}
+		return cfg;
 	}
 
 	public static Multikeybind fromConfig(String config)
@@ -135,7 +142,7 @@ public class Multikeybind
 		{
 			return null;
 		}
-		if (!config.isEmpty())
+		if (!(config.isEmpty() || UNSET.equals(config)))
 		{
 			try
 			{
