@@ -77,8 +77,19 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	private static final Map<Integer, String> SAVE_LAST_DEST = ImmutableMap.<Integer, String>builder()
 		.put(ItemID.LEAGUE_CLUE_COMPASS_TELEPORT, "clue-compass-teleports")
 		.put(ItemID.LEAGUE_BANK_HEIST_TELEPORT, "bank-heist-teleports")
+		.put(ItemID.LEAGUE_AGILITY_MAP, "agility-map-teleports")
+		.put(ItemID.LEAGUE_EVIL_EYE_NECKLACE, "evil-eye-teleports")
 		.build();
+
+	private static final Map<Pattern, String> LAST_DEST_REWRITES = ImmutableMap.<Pattern, String>builder()
+		.put(Pattern.compile("^.*-agility-shortcuts$"), "agility-map-teleports")
+		.put(Pattern.compile("^bank-heist-teleports-.*$"), "bank-heist-teleports")
+		.put(Pattern.compile("^evil-eye-teleports-.*$"), "evil-eye-teleports")
+		.build();
+
 	private static final Set<String> LAST_DEST_NAMES = ImmutableSet.copyOf(SAVE_LAST_DEST.values());
+
+	private static final String BACK_MENU_ITEM = "Back";
 
 	// cleanify(display) -> canon
 	private static Map<String, String> canonicalNames = new HashMap<>();
@@ -469,9 +480,15 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 
 		void saveLastDest()
 		{
-			if (LAST_DEST_NAMES.contains(menuIdentifier))
+			log.debug("teleported {}", menuIdentifier);
+			var destIdentifier = menuIdentifier;
+			for (var e : LAST_DEST_REWRITES.entrySet())
 			{
-				configManager.setRSProfileConfiguration(BetterTeleportMenuConfig.GROUP, "lastdest." + menuIdentifier, displayText);
+				destIdentifier = e.getKey().matcher(destIdentifier).replaceAll(e.getValue());
+			}
+			if (LAST_DEST_NAMES.contains(destIdentifier) && !BACK_MENU_ITEM.equals(displayText))
+			{
+				configManager.setRSProfileConfiguration(BetterTeleportMenuConfig.GROUP, "lastdest." + destIdentifier, displayText);
 			}
 		}
 
