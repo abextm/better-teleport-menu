@@ -439,15 +439,7 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		{
 			SwingUtilities.invokeLater(() ->
 			{
-				Window window = null;
-				for (Component c = (Component) client; c != null; c = c.getParent())
-				{
-					if (c instanceof Window)
-					{
-						window = (Window) c;
-						break;
-					}
-				}
+				Window window = SwingUtilities.windowForComponent((Component) client);
 				new HotkeyDialog(window, this.displayText, defaultMultiBind(), bind, bind ->
 				{
 					this.bind = bind;
