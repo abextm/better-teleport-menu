@@ -127,7 +127,17 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 		List<TeleMenu> change = null;
 		for (TeleMenu menu : teleMenus)
 		{
-			if (client.getWidget(menu.textWidget.getId() >> 16, 0) == null)
+			boolean found = false;
+			for (var e : client.getComponentTable())
+			{
+				if (e.getId() == menu.textWidget.getId() >> 16)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
 			{
 				if (change == null)
 				{
