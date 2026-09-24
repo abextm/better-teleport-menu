@@ -565,7 +565,10 @@ public class BetterTeleportMenuPlugin extends Plugin implements KeyListener
 	{
 		assert w.getId() == w.getParentId();
 		// we are abusing this cs2 to just do a cc_find + cc_resume_pausebutton for us
-		client.runScript(ScriptID.SOMETHING_THAT_CC_RESUME_PAUSEBUTTON, w.getId(), w.getIndex());
+		client.createScriptEventBuilder(ScriptID.SOMETHING_THAT_CC_RESUME_PAUSEBUTTON, w.getId(), w.getIndex())
+			.build()
+			.setCanSendPackets(true)
+			.run();
 	}
 
 	private static String cleanify(String in)
